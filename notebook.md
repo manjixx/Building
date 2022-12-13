@@ -36,22 +36,31 @@
 
 ## 二、工作计划
 
-- [ ] 登陆页面设计
-- [ ] 热舒适信息采集页面设计
-  - [ ] 新用户弹窗，个人信息采集
-  - [ ] 旧用户，实时信息采集
+- 2022/12/13
+  - [x] 登陆页面开发
+  - [x] 登录拦截器
+  - [x] 用户信息加密与登录认证
+  - [x] 用户登出与完善的访问拦截
+- 2022/12/14
+  - [ ] 合并登录与注册页面
+  - [ ] 修改导航栏
+  - [ ] 热舒适信息采集页面设计
+    - [ ] 新用户弹窗，个人信息采集
+    - [ ] 旧用户，实时信息采集
 
 ## 三、登陆页面开发
 
-### 3.1 前端开发
+### 3.1 前端页面开发
 
-> **前端界面开发**
+> **`Login.vue`与`AppIndex.vue`开发**
 
 - 开发登录页面组件，右键 `src\components` 文件夹，新建`Login.vue`文件
 
 - 新建首页组件，右键 `src\components` 文件夹，新建一个 `directory`，命名为 `home`，再在 `home` 下新建一个 `Appindex.vue`
 
-> **前端相关配置**
+### 3.2 前端相关配置
+
+> **设置反向代理**
 
 - 修改 `src\main.js` 代码如下, 使用了新的模块 `axios`，所以需要进入到项目文件夹中，执行 `npm install --save axios`，以安装这个模块：
 
@@ -81,7 +90,9 @@ new Vue({
 })
  ```
 
-- **配置页面路由**，修改 `src\router\index.js` 代码如下:
+> **配置页面路由**
+
+修改 `src\router\index.js` 代码如下:
 
 ```js
 import Vue from 'vue'
@@ -109,7 +120,9 @@ export default new Router({
 })
 ```
 
-- **跨域支持**，在 `config\index.js` 中，找到 `proxyTable` 位置，修改为以下内容:
+> **跨域支持**
+
+在 `config\index.js` 中，找到 `proxyTable` 位置，修改为以下内容:
 
 ```js
     proxyTable: {
@@ -123,7 +136,9 @@ export default new Router({
     }
  ```
 
-- **修改路由模式为`history`模式**，在`config/index.js`文件下添加如下代码：
+> **使用`history`模式**
+
+ **修改路由模式为`history`模式**，在`config/index.js`文件下添加如下代码：
 
 ```js
 mode: 'history',
@@ -244,9 +259,216 @@ public class LoginController {
 }
  ```
 
-## 四、用户认证与访问拦截
+## 四、登录拦截器
 
-### 4.1 使用Shiro实现用户信息加密
+### 4.1 后端登录拦截器
+
+> **LoginController**
+
+```java
+@Controller
+public class LoginController {
+
+    @Autowired
+    UserService userService;
+
+    @CrossOrigin
+    @PostMapping(value = "/api/login")
+    @ResponseBody
+    public Result login(@RequestBody User requestUser, HttpSession session) {
+        String username = requestUser.getUsername();
+        username = HtmlUtils.htmlEscape(username);
+
+        User user = userService.get(username, requestUser.getPassword());
+        if (null == user) {
+            return new Result(400);
+        } else {
+            session.setAttribute("user", user);
+            return new Result(200);
+        }
+    }
+}
+```
+
+> **LoginInterceptor**
+
+```java
+public class LoginInterceptor  implements HandlerInterceptor{
+
+    @Override
+    public boolean preHandle (HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
+        HttpSession session = httpServletRequest.getSession();
+        String contextPath=session.getServletContext().getContextPath();
+        String[] requireAuthPages = new String[]{
+                "index",
+        };
+
+        String uri = httpServletRequest.getRequestURI();
+
+        uri = StringUtils.remove(uri, contextPath+"/");
+        String page = uri;
+
+        if(begingWith(page, requireAuthPages)){
+            User user = (User) session.getAttribute("user");
+            if(user==null) {
+                httpServletResponse.sendRedirect("login");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean begingWith(String page, String[] requiredAuthPages) {
+        boolean result = false;
+        for (String requiredAuthPage : requiredAuthPages) {
+            if(StringUtils.startsWith(page, requiredAuthPage)) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
+}
+```
+
+> **WebConfigurer**
+
+```java
+@SpringBootConfiguration
+public class WebConfigurer implements WebMvcConfigurer {
+
+    @Bean
+    public LoginInterceptor getLoginIntercepter() {
+        return new LoginInterceptor();
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry){
+        registry.addInterceptor(getLoginIntercepter()).addPathPatterns("/**").excludePathPatterns("/index.html");
+    }
+}
+```
+
+### 4.2 Vuex 与前端登录拦截器
+
+> **引入 Vuex**
+
+- 运行 `npm install vuex --save`
+- 在 `src` 目录下新建一个文件夹 `store`，并在该目录下新建 `index.js` 文件，在该文件中引入 `vue` 和 `vuex`，代码如下：
+
+```js
+import Vue from 'vue'
+import Vuex from 'vuex'
+
+Vue.use(Vuex)
+
+export default new Vuex.Store({
+  state: {
+    user: {
+      username: window.localStorage.getItem('user' || '[]') == null ? '' : JSON.parse(window.localStorage.getItem('user' || '[]')).username
+    }
+  },
+  mutations: {
+    login (state, user) {
+      state.user = user
+      window.localStorage.setItem('user', JSON.stringify(user))
+    }
+  }
+})
+```
+
+> **修改路由配置**
+
+为了区分页面是否需要拦截，我们需要修改一下 `src\router\index.js`，在需要拦截的路由中加一条元数据，设置一个 `requireAuth` 字段如下：
+
+```js
+{
+  path: '/index',
+  name: 'AppIndex',
+  component: AppIndex,
+  meta: {
+    requireAuth: true
+  }
+}
+```
+
+> **使用钩子函数判断是否拦截**
+
+钩子函数及在某些时机会被调用的函数。这里我们使用 `router.beforeEach()`，意思是在访问每一个路由前调用。打开 `src\main.js` 。
+
+- 首先添加对 `store` 的引用
+
+```js
+import store from './store'
+```
+
+- 并修改 Vue 对象里的内容
+
+```js
+new Vue({
+  el: '#app',
+  render: h => h(App),
+  router,
+  // 注意这里
+  store,
+  components: { App },
+  template: '<App/>'
+})
+```
+
+- 写 `beforeEach()` 函数
+
+```js
+router.beforeEach((to, from, next) => {
+    if (to.meta.requireAuth) {
+      if (store.state.user.username) {
+        next()
+      } else {
+        next({
+          path: 'login',
+          query: {redirect: to.fullPath}
+        })
+      }
+    } else {
+      next()
+    }
+  }
+)
+```
+
+> **修改 Login.vue**
+
+1. 点击登录按钮，向后端发送数据
+2. 受到后端返回的成功代码时，触发 store 中的 login() 方法，把 loginForm 对象传递给 store 中的 user 对象（*这里只是简单的实现，在后端我们可以通过用户名和密码查询数据库，获得 user 表的完整信息，比如用户昵称、用户级别等，返回前端，并传递给 user 对象，以实现更复杂的功能）
+3. 获取登录前页面的路径并跳转，如果该路径不存在，则跳转到首页
+
+修改后的 `login()` 方法如下：
+
+```js
+login () {
+  var _this = this
+  console.log(this.$store.state)
+  this.$axios
+    .post('/login', {
+      username: this.loginForm.username,
+      password: this.loginForm.password
+    })
+    .then(successResponse => {
+      if (successResponse.data.code === 200) {
+        // var data = this.loginForm
+        _this.$store.commit('login', _this.loginForm)
+        var path = this.$route.query.redirect
+        this.$router.replace({path: path === '/' || path === undefined ? '/index' : path})
+      }
+    })
+    .catch(failResponse => {
+    })
+}
+```
+
+## 五、使用Shiro实现用户信息加密与登录认证
+
+### 4.1 用户信息加密
 
 加密在注册与认证中都有体现，但考虑到认证要用到 shiro，所以先讲在注册中的实现。
 
@@ -401,7 +623,7 @@ Shiro还具备四大功能
 
 各种安全框架解决的都是这几类问题，看名字就大概知道是什么意思了。
 
-#### 4.2.2 Shiro配置与登录拦截
+#### 4.2.2 Shiro配置与登录验证
 
 > **添加maven依赖**
 
@@ -505,4 +727,209 @@ public class ShiroConfig {
 }
 ```
 
-### 4.2 用户认证方案与完善的访问拦截
+## 六、用户登出功能与完善的访问拦截
+
+### 6.1 用户登出功能开发
+
+#### 6.1.1 后端
+
+> **修改`LoginController`**
+
+```java
+    @ResponseBody
+    @GetMapping("api/logout")
+    public Result logout() {
+        Subject subject = SecurityUtils.getSubject();
+        subject.logout();
+        String message = "成功登出";
+        return ResultFactory.buildSuccessResult(message);
+    }
+```
+
+> **修改WebConfigurer**
+
+由于登出功能不需要被拦截，所以我们还需要修改配置类 `WebConfigurer` 的 `addInterceptors()` 方法，添加一条路径：
+
+```java
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(getLoginIntercepter())
+                .addPathPatterns("/**")
+                .excludePathPatterns("/index.html")
+                .excludePathPatterns("/api/login")
+                .excludePathPatterns("/api/logout");
+    }
+```
+
+#### 6.1.2 前端
+
+> **导航栏增加等处按钮**
+
+```js
+<i class="el-icon-switch-button" v-on:click="logout" style="float:right;font-size: 40px;color: #222;padding: 10px"></i>
+```
+
+调整样式：
+
+```js
+.el-icon-switch-button {
+  cursor: pointer;
+  outline:0;
+}
+
+```
+
+在 methods 中编写 logout() 方法：
+
+```js
+logout () {
+  var _this = this
+  this.$axios.get('/logout').then(resp => {
+    if (resp.data.code === 200) {
+      // 前后端状态保持一致
+      _this.$store.commit('logout')
+      _this.$router.replace('/login')
+    }
+  })
+}
+```
+
+> **在 store 中定义 logout 方法**
+
+```js
+    logout (state) {
+      state.user = []
+      window.localStorage.removeItem('user')
+    }
+```
+
+### 6.2 完善的访问拦截
+
+#### 6.2.1 后端登录拦截
+
+> **编写一下拦截器 `LoginInterceptor`**
+
+主要是修改 `preHandle` 方法
+
+```java
+    @Override
+    public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
+
+        // 放行 options 请求，否则无法让前端带上自定义的 header 信息，导致 sessionID 改变，shiro 验证失败
+        if (HttpMethod.OPTIONS.toString().equals(httpServletRequest.getMethod())) {
+            httpServletResponse.setStatus(HttpStatus.NO_CONTENT.value());
+            return true;
+        }
+
+        Subject subject = SecurityUtils.getSubject();
+        // 使用 shiro 验证
+        if (!subject.isAuthenticated()) {
+            return false;
+        }
+        return true;
+    }
+```
+
+> **修改配置类 `WebConfigurer`**
+
+为了允许跨域的 cookie，我们需要修改`addCorsMappings` 方法：
+
+```java
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowCredentials(true)
+                .allowedOrigins("http://localhost:8080")
+                .allowedMethods("POST", "GET", "PUT", "OPTIONS", "DELETE")
+                .allowedHeaders("*")
+    }
+```
+
+#### 6.2.2 前端配置
+
+> **修改`main.js`**
+
+为了让前端能够带上 cookie，我们需要通过 axios 主动开启 withCredentials 功能，即在 main.js 中添加一行
+
+```js
+axios.defaults.withCredentials = true
+```
+
+> **修改`router.beforEach`**
+
+即后端接口的拦截是实现了，但页面的拦截并没有实现，仍然可以通过伪造参数，绕过前端的路由限制，访问本来需要登录才能访问的页面。为了解决这个问题，我们可以修改 `router.beforeEach` 方法：
+
+```js
+router.beforeEach((to, from, next) => {
+    if (to.meta.requireAuth) {
+      if (store.state.user) {
+        axios.get('/authentication').then(resp => {
+          if (resp) next()
+        })
+      } else {
+        next({
+          path: 'login',
+          query: {redirect: to.fullPath}
+        })
+      }
+    } else {
+      next()
+    }
+  }
+)
+```
+
+即访问每个页面前都向后端发送一个请求，目的是**经由拦截器验证服务器端的登录状态**，防止上述情况的发生。后端这个接口可以暂时写成空的，比如：
+
+```java
+    @ResponseBody
+    @GetMapping(value = "api/authentication")
+    public String authentication(){
+        return "身份认证成功";
+    }
+```
+
+#### 6.2.3 rememberMe
+
+文提到 cookie 的生命周期如果未特别设置则与浏览器保持一致。并没有设置存活时间，所以在关闭浏览器后，sessionId 就会消失，再次发送请求，shiro 就会认为用户已经变更。但有时我们需要保持登录状态，不然每次都要重新登录怪麻烦的，所以 shiro 提供了 rememberMe 机制。
+
+ememberMe 机制不是单纯地设置 cookie 存活时间，而是又单独保存了一种新的状态。之所以这样设计，也是出于安全性考虑，把 “记住我” 的状态与实际登录状态做出区分，这样，就可以控制用户在访问不太敏感的页面时无需重新登录，而访问类似于购物车、订单之类的页面时必须重新登录。
+
+> **修改`shiro`配置类**
+
+```java
+    public CookieRememberMeManager rememberMeManager() {
+        CookieRememberMeManager cookieRememberMeManager = new CookieRememberMeManager();
+        cookieRememberMeManager.setCookie(rememberMeCookie());
+        cookieRememberMeManager.setCipherKey("EVANNIGHTLY_WAOU".getBytes());
+        return cookieRememberMeManager;
+    }
+
+    @Bean
+    public SimpleCookie rememberMeCookie() {
+        SimpleCookie simpleCookie = new SimpleCookie("rememberMe");
+        simpleCookie.setMaxAge(259200);
+        return simpleCookie;
+    }
+```
+
+> **在登录方法中设置 `UsernamePasswordToken` 的 `rememberMe` 属性**
+
+```java
+···
+UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(username, requestUser.getPassword());
+usernamePasswordToken.setRememberMe(true);
+try {
+    subject.login(usernamePasswordToken);
+    ···
+    }
+
+```
+
+在拦截器中进行具体的判断逻辑，由于目前我们并没有特殊需求，所以姑且两种状态都放行：
+
+```java
+if (!subject.isAuthenticated() && !subject.isRemembered()) {
+    return false;
+}
+```
