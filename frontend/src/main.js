@@ -6,23 +6,22 @@ import router from './router'
 import store from './store'
 import axios from 'axios'
 import ElementUI from 'element-ui'
-
+import 'element-ui/lib/theme-chalk/index.css'
 Vue.use(ElementUI)
 
 // 设置反向代理，前端请求默认发送到 http://localhost:8443/api
 Vue.prototype.$axios = axios
 axios.defaults.baseURL = 'http://localhost:8443/api'
 axios.defaults.withCredentials = true
+// axios.defaults.timeout = 5000
 // 全局注册，之后可在其他组件中通过 this.$axios 发送数据
 Vue.prototype.$axios = axios
 Vue.config.productionTip = false
 
 router.beforeEach((to, from, next) => {
   if (to.meta.requireAuth) {
-    if (store.state.user) {
-      axios.get('/authentication').then(resp => {
-        if (resp) next()
-      })
+    if (store.state.user.username) {
+      next()
     } else {
       next({
         path: 'login',
@@ -32,8 +31,7 @@ router.beforeEach((to, from, next) => {
   } else {
     next()
   }
-}
-)
+})
 
 /* eslint-disable no-new */
 new Vue({

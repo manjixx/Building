@@ -35,6 +35,7 @@ public class UserService {
 
     public void add(User user) {
         userDAO.save(user);
+        System.out.println("保存用户成功");
     }
 
 }

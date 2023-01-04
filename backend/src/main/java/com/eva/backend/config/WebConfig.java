@@ -16,16 +16,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
     @Bean
-    public LoginInterceptor getLoginIntercepter() {
+    public LoginInterceptor getLoginInterceptor() {
         return new LoginInterceptor();
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(getLoginIntercepter())
+        registry.addInterceptor(getLoginInterceptor())
                 .addPathPatterns("/**")
                 .excludePathPatterns("/index.html")
                 .excludePathPatterns("/api/login")
+                .excludePathPatterns("/api/register")
                 .excludePathPatterns("/api/logout");
     }
 

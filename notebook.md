@@ -45,8 +45,8 @@
   - [ ] 合并登录与注册页面
   - [ ] 修改导航栏
   - [ ] 热舒适信息采集页面设计
-    - [ ] 新用户弹窗，个人信息采集
-    - [ ] 旧用户，实时信息采集
+    - [ ] 个人信息采集
+    - [ ] 实时信息采集
 
 ## 三、登陆页面开发
 
@@ -932,4 +932,273 @@ try {
 if (!subject.isAuthenticated() && !subject.isRemembered()) {
     return false;
 }
+```
+
+## 七、热舒适信息采集页面设计
+
+### 7.1 导航栏设计
+
+项目虽然本质上是单页面应用，但表面上有多个功能页面。目前针对实验人员设计两个页面：
+
+- 个人信息采集页面
+- 个人实时反馈采集页面
+
+#### 7.1.1 路由配置
+
+我们**需要把导航栏放在其它页面的父页面中**（对 `Vue` 来说就是父组件），之前我们讲过，`App.vue` 是所有组件的父组件，但把导航栏放进去不合适，因为我们的登录页面中不应该显示导航栏。
+
+> **新建`Home.vue`**
+
+为了解决这个问题，我们在 `components` 目录下直接新建一个组件，命名为 `Home.vue`，原始代码如下：
+
+```js
+<template>
+  <div>
+    <!--这里和App.vue一样，写入了一个<router-view/>，即子页面（组件）显示的地方-->
+    <router-view/>
+  </div>
+</template>
+
+<script>
+  export default {
+    name: 'Home'
+  }
+</script>
+
+<style scoped>
+
+</style>
+```
+
+> **建立路由的父子关系**
+
+我们在**一个组件中通过导入引用了其它组件，也可以称之为父子组件**，但想要通过 `<router-view/>` 控制子组件的显示，则需要进行路由的相关配置。
+
+修改`router/index.js`代码如下：
+
+```js
+import Vue from 'vue'
+import Router from 'vue-router'
+import AppIndex from '../components/home/AppIndex'
+import Login from '../components/Login'
+import Home from '../components/Home'
+
+Vue.use(Router)
+
+export default new Router({
+  mode: 'history',
+  routes: [
+    {
+      path: '/home',
+      name: 'Home',
+      component: Home,
+      // home页面并不需要被访问
+      redirect: '/index',
+      children: [
+        {
+          path: '/index',
+          name: 'AppIndex',
+          component: AppIndex,
+          meta: {
+            requireAuth: true
+          }
+        }
+      ]
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      component: Login
+    }
+  ]
+})
+```
+
+注意我们并没有把首页的访问路径设置为 `/home/index`，仍然可以通过 `/index` 访问首页，这样配置其实是感受不到 `/home` 这个路径的存在的。之后再添加新的页面，可以直接在 `children` 中增添对应的内容。
+
+#### 7.1.2 使用NavMenu组件
+
+打开 Element 的文档，找到 [NavMenu 组件相关内容](https://element.eleme.cn/2.0/#/zh-CN/component/menu)
+
+- 在`component`文件夹里新建一个 `common` 文件夹，用来存储公共的组件，并在该文件夹新建一个组件 `NavMenu.vue`，经过修改的代码如下：
+
+```js
+<template>
+  <el-menu
+    :default-active="'/index'"
+    router
+    mode="horizontal"
+    background-color="white"
+    text-color="#222"
+    active-text-color="red"
+    style="min-width: 1300px">
+    <el-menu-item v-for="(item,i) in navList" :key="i" :index="item.name">
+      {{ item.navItem }}
+    </el-menu-item>
+<!--    <a href="#nowhere" style="color: #222;float: right;padding: 20px;">更多功能</a>-->
+    <i class="el-icon-menu" style="float:right;font-size: 45px;color: #222;padding-top: 8px"></i>
+    <i class="el-icon-switch-button" v-on:click="logout" style="float:right;font-size: 40px;color: #070707;padding: 10px"></i>
+    <span style="position: absolute;padding-top: 20px;right: 43%;font-size: 20px;font-weight: bold">人员热舒适数据采集系统</span>
+<!--    <el-input-->
+<!--      placeholder="快速搜索..."-->
+<!--      prefix-icon="el-icon-search"-->
+<!--      size="medium"-->
+<!--      style="width: 300px;position:absolute;margin-top: 12px;right: 18%"-->
+<!--      v-model="keywords">-->
+<!--    </el-input>-->
+  </el-menu>
+</template>
+
+<script>
+export default {
+  // name: 'NavMenu',
+  // data () {
+  //   return {
+  //     navList: [
+  //       {name: '/index', navItem: '首页'},
+  //       {name: '/jotter', navItem: '笔记本'},
+  //       {name: '/library', navItem: '图书馆'},
+  //       {name: '/admin', navItem: '个人中心'}
+  //     ]
+  //   }
+  // },
+  methods: {
+    handleSelect (key, keyPath) {
+      console.log(key, keyPath)
+    },
+    logout () {
+      var _this = this
+      this.$axios.get('/logout').then(resp => {
+        if (resp.data.code === 200) {
+          // 登出操作前后端应保持一致
+          _this.$store.commit('logout')
+          _this.$router.replace('/login')
+        }
+      }).catch(failResponse => {})
+    }
+  }
+}
+</script>
+
+<style scoped>
+a{
+  text-decoration: none;
+}
+
+span {
+  pointer-events: none;
+}
+
+.el-icon-switch-button {
+  cursor: pointer;
+  /*去除点击时的框线*/
+  outline:0;
+  color: white;
+}
+
+</style>
+```
+
+- 第一，在 `<el-menu>` 标签中我们开启了 `router` 模式，在 `Element` 文档中的解释如下：
+![](https://img-blog.csdnimg.cn/20190505200742154.png)
+
+第二，我们通过 `v-for` 指令，把 navList 数组渲染为一组 `<el-menu-item>` 元素，也即导航栏的内容。当然我们也可以分开写，这种用法只是显得 six 一些（当需要动态更改列表内容时就很有用了）
+
+### 7.2 数据采集页面设计
+
+#### 7.2.1 PersonInfo.vue
+
+> **新建数据采集页面的根组件**
+
+在 `components` 中新建文件夹 `person`，新建组件 `PersonIndex.vue`，作为数据采集页面的根组件，代码如下
+
+```js
+<template>
+  <el-container>
+    <el-aside style="width: 200px;margin-top: 20px">
+      <switch></switch>
+      <!--<SideMenu></SideMenu>-->
+    </el-aside>
+    <el-main>
+      <!--<books></books>-->
+    </el-main>
+  </el-container>
+</template>
+
+<script>
+
+  export default {
+    name: 'AppPerson'
+  }
+</script>
+
+<style scoped>
+
+</style>
+```
+
+> **配置页面路由**
+
+接下来我们配置这个页面的路由，修改 `router/index.js` 代码如下：
+
+```js
+import Vue from 'vue'
+import Router from 'vue-router'
+import Home from '../components/Home'
+import PersonIndex from '../components/person/PersonIndex'
+// 导入刚才编写的组件
+import AppIndex from '@/components/home/AppIndex'
+import Login from '@/components/Login'
+import Register from '../components/Register'
+import PersonIndex from '../components/person/PersonIndex'
+
+Vue.use(Router)
+
+export default new Router({
+  mode: 'history',
+  routes: [
+    // 下面都是固定的写法
+    {
+      path: '/',
+      name: 'Default',
+      redirect: '/home',
+      component: Home
+    },
+    {
+      // home页面并不需要被访问，只是作为其它组件的父组件
+      path: '/home',
+      name: 'Home',
+      component: Home,
+      redirect: '/index',
+      children: [
+        {
+          path: '/index',
+          name: 'AppIndex',
+          component: AppIndex,
+          meta: {
+            requireAuth: true
+          }
+        },
+        {
+          path: '/person',
+          name: 'PersonIndex',
+          component: PersonIndex,
+          meta: {
+            requireAuth: true
+          }
+        }
+      ]
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      component: Login
+    },
+    {
+      path: '/register',
+      name: 'Register',
+      component: Register
+    }
+  ]
+})
 ```
