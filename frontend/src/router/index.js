@@ -6,6 +6,7 @@ import AppIndex from '@/components/home/AppIndex'
 import Login from '@/components/Login'
 import Register from '../components/Register'
 import PersonIndex from '../components/person/PersonIndex'
+import PersonFeedback from '../components/person/PersonFeedback'
 
 Vue.use(Router)
 
@@ -38,6 +39,14 @@ export default new Router({
           path: '/person',
           name: 'PersonIndex',
           component: PersonIndex,
+          meta: {
+            requireAuth: true
+          }
+        },
+        {
+          path: '/person',
+          name: 'PersonFeedBack',
+          component: PersonFeedback,
           meta: {
             requireAuth: true
           }

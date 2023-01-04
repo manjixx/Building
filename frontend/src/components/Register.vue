@@ -73,8 +73,7 @@ export default{
 
 <style>
 #paper {
-  background:url("../assets/eva1.jpg") no-repeat;
-  background-position: center;
+  background: url("../assets/eva1.jpg") no-repeat center;
   height: 100%;
   width: 100%;
   background-size: cover;

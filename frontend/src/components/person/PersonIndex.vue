@@ -23,8 +23,10 @@ export default {
       componted: PersonInfo
     }
   },
-  parentHandle (key) {
-    this.componted = key
+  methods: {
+    parentHandle (key) {
+      this.componted = key
+    }
   }
 }
 </script>

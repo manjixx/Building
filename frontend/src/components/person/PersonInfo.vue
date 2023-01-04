@@ -38,7 +38,7 @@
         <el-row>
           <el-col :span="24" class="topic_form">1.  请选择对日常工作环境的主观偏好</el-col>
           <el-col :span="24" class="option_form">
-            <el-form-item prop="infoF">
+            <el-form-item prop="pref">
               <el-radio-group v-model="infoForm.pref" class = el-radio_label>
                 <el-radio :label="-1" >偏凉爽</el-radio>
                 <el-radio :label="0" >中性</el-radio>
@@ -272,7 +272,7 @@ export default {
     }
   },
   methods: {
-    submitForm (infoForm) {
+    submitForm () {
       try {
         this.$refs.infoForm.validate((valid) => {
           if (valid) {
@@ -286,7 +286,7 @@ export default {
         console.log(e)
       }
     },
-    resetForm (infoForm) {
+    resetForm () {
       this.$refs.infoForm.resetFields()
     }
   }
