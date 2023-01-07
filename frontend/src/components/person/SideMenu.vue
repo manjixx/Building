@@ -31,7 +31,7 @@ export default {
 .categories {
   position: fixed;
   margin-left: 50%;
-  left: -600px;
+  left: -700px;
   top: 100px;
   width: 150px;
 }

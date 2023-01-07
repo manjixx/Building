@@ -1,32 +1,84 @@
 <template>
-  <body id="poster">
-  <el-form :model="feedBackForm" :rules="rules" ref="feedBackForm" class="login-container" label-position="left" label-width="0px">
-    <h3 class="login_title">热舒适反馈表</h3>
-    <el-form-item>
-      <el-input type="text" v-model="feedBackForm.thermalSens"
-                auto-complete="off" placeholder="账号"></el-input>
-    </el-form-item>
-    <el-form-item>
-      <el-input type="text" v-model="feedBackForm.humidSens"
-                auto-complete="off" placeholder="密码"></el-input>
-    </el-form-item>
-    <el-form-item prop="thermalAccept">
-      <el-radio-group v-model="feedBackForm.thermalAccept" class = el-radio_label>
-        <el-radio :label="0" >可接受</el-radio>
-        <el-radio :label="1" >不可接受</el-radio>
-      </el-radio-group>
-    </el-form-item>
-    <el-form-item prop="thermalComfort">
-      <el-radio-group v-model="feedBackForm.thermalComfort" class = el-radio_label>
-        <el-radio :label="0" >舒适</el-radio>
-        <el-radio :label="1" >不舒适</el-radio>
-      </el-radio-group>
-    </el-form-item>
-    <el-form-item style="width: 100%">
-      <el-button type="primary" style="width: 100%;background: #505458;border: none" v-on:click="submitForm">登录</el-button>
-    </el-form-item>
-  </el-form>
-  </body>
+  <div class="container">
+    <div class="details-bg">
+    <h3 class="form_title">热舒适反馈表</h3>
+    <el-form :inline="true" :model="feedBackForm" :rules="rules" ref="feedBackForm" class="login-container" label-position="left" lable-width="80px" >
+      <el-row :gutter=24>
+        <el-col :span=12>
+          <el-form-item label="时间" label-position="left" prop="time" >
+            <el-time-select
+              v-model="feedBackForm.time"
+              :picker-options="{
+                start: '08:30',
+                step: '00:30',
+                end: '18:30'
+              }"
+              placeholder="选择时间">
+            </el-time-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="热感觉" label-position="left" prop="thermalSens">
+            <el-input v-model="feedBackForm.thermalSens"></el-input>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row :gutter=24>
+        <el-col :span=12>
+          <el-form-item label="湿度感觉" prop="humidSens">
+            <el-input v-model="feedBackForm.humidSens"></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="热可接受性" prop="thermalAccept">
+            <el-select v-model="feedBackForm.thermalAccept">
+              <el-option label="可接受" value="1"></el-option>
+              <el-option label="不可接受" value="0"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row :gutter=24>
+        <el-col :span=12>
+          <el-form-item label="热舒适" prop="thermalComfort">
+            <el-select v-model="feedBackForm.thermalComfort">
+              <el-option label="舒适" value="1"></el-option>
+              <el-option label="不舒适" value="0"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="风速可接受性" prop="airVelAccept">
+            <el-select v-model="feedBackForm.airVelAccept">
+              <el-option label="可接受" value="1"></el-option>
+              <el-option label="不可接受" value="0"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row :gutter=24>
+        <el-col :span=12>
+          <el-form-item label="实时热偏好" prop="thermalPref">
+            <el-select v-model="feedBackForm.thermalPref">
+              <el-option label="变凉" value="-1"></el-option>
+              <el-option label="不变" value="0"></el-option>
+              <el-option label="变热" value="1"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="情绪" prop="mood">
+            <el-select v-model="feedBackForm.mood">
+              <el-option label="负面" value="-1"></el-option>
+              <el-option label="中性" value="0"></el-option>
+              <el-option label="正面" value="1"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
+    </el-form>
+  </div>
+</div>
 </template>
 <script>
 
@@ -40,6 +92,7 @@ export default {
       },
       checked: true,
       feedBackForm: {
+        time: '',
         thermalSens: '',
         humidSens: '',
         thermalAccept: '',
@@ -101,17 +154,18 @@ body{
 .login-container {
   border-radius: 15px;
   background-clip: padding-box;
-  margin: 90px auto;
-  width: 350px;
+  margin: 20px auto;
+  width: 780px;
   padding: 35px 35px 15px 35px;
   background: #fff;
-  border: 1px solid #eaeaea;
-  box-shadow: 0 0 25px #cac6c6;
+  /*border: 1px solid #eaeaea;*/
+  /*box-shadow: 0 0 20px #cac6c6;*/
 }
-.login_title {
-  margin: 0px auto 40px auto;
+.form_title {
+  /*margin: 0px auto 40px auto;*/
   text-align: center;
-  color: #505458;
+  /*color: #505458;*/
+  margin-bottom: 12px;
+  margin-top: 18px;
 }
-
 </style>

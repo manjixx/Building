@@ -1,8 +1,8 @@
 <template>
   <div class="container">
     <div class="details-bg">
-      <h3 class="form_header" >个人基本信息</h3>
-      <el-form :model="infoForm" :rules="infoRules" ref="infoForm" label-width="80px" class="block_form">
+      <h3 class="form_title" >个人基本信息</h3>
+      <el-form :inline="true" :model="infoForm" :rules="infoRules" ref="infoForm" label-width="80px" class="block_form" label-position="left">
         <el-row :gutter=24>
           <el-col :span=12 >
             <el-form-item label="姓名" prop="name" >
@@ -10,8 +10,8 @@
             </el-form-item>
           </el-col>
           <el-col :span=12>
-            <el-form-item label="性别" prop="gender" style="width:max-content">
-              <el-select v-model="infoForm.gender" style="width:268px">
+            <el-form-item label="性别" prop="gender">
+              <el-select v-model="infoForm.gender">
                 <el-option label="男" value="1"></el-option>
                 <el-option label="女" value="0"></el-option>
               </el-select>
@@ -33,7 +33,7 @@
       </el-form>
     </div>
     <div class="details-bg">
-      <h3 class="form_header">热环境与热舒适影响因素的主观评价</h3>
+      <h3 class="form_title">热环境与热舒适影响因素的主观评价</h3>
       <el-form :model="infoForm" :rules="infoRules" ref="infoForm" class="block_form">
         <el-row>
           <el-col :span="24" class="topic_form">1.  请选择对日常工作环境的主观偏好</el-col>
@@ -69,7 +69,7 @@
             </el-form-item>
           </el-col>
 
-          <el-col :span="24" class="topic_form">4. 请选择对"室内温度对你的热体验/热舒适性影响非常大"这一命题认同的认同程度</el-col>
+          <el-col :span="24" class="topic_form">4. 请选择对"室内温度对你的热体验/热舒适性影响非常大"这一命题的认同程度</el-col>
           <el-col :span="24" class="option_form">
             <el-form-item prop="impInTmp">
               <el-radio-group v-model="infoForm.impInTmp" class = el-radio_label>
@@ -82,7 +82,7 @@
             </el-form-item>
           </el-col>
 
-          <el-col :span="24" class="topic_form">5. 请选择对"室内湿度对你的热体验/热舒适性影响非常大"这一命题认同的认同程度</el-col>
+          <el-col :span="24" class="topic_form">5. 请选择对"室内湿度对你的热体验/热舒适性影响非常大"这一命题的认同程度</el-col>
           <el-col :span="24" class="option_form">
             <el-form-item prop="impInRh">
               <el-radio-group v-model="infoForm.impInRh" class = el-radio_label>
@@ -95,7 +95,7 @@
             </el-form-item>
           </el-col>
 
-          <el-col :span="24" class="topic_form">6. 请选择对"室内空气质量对你的热体验/热舒适性影响非常大"这一命题认同的认同程度</el-col>
+          <el-col :span="24" class="topic_form">6. 请选择对"室内空气质量对你的热体验/热舒适性影响非常大"这一命题的认同程度</el-col>
           <el-col :span="24" class="option_form">
             <el-form-item prop="impInAQ">
               <el-radio-group v-model="infoForm.impInAQ" class = el-radio_label>
@@ -108,7 +108,7 @@
             </el-form-item>
           </el-col>
 
-          <el-col :span="24" class="topic_form">7. 请选择对"室内空气流速对你的热体验/热舒适性影响非常大"这一命题认同的认同程度</el-col>
+          <el-col :span="24" class="topic_form">7. 请选择对"室内空气流速对你的热体验/热舒适性影响非常大"这一命题的认同程度</el-col>
           <el-col :span="24" class="option_form">
             <el-form-item prop="impInAV">
               <el-radio-group v-model="infoForm.impInAV" class = el-radio_label>
@@ -134,7 +134,7 @@
             </el-form-item>
           </el-col>
 
-          <el-col :span="24" class="topic_form">9. 请选择对"室外温度对你的热体验/热舒适性影响非常大"这一命题认同的认同程度</el-col>
+          <el-col :span="24" class="topic_form">9. 请选择对"室外温度对你的热体验/热舒适性影响非常大"这一命题的认同程度</el-col>
           <el-col :span="24" class="option_form">
             <el-form-item prop="impOTmp">
               <el-radio-group v-model="infoForm.impOTmp" class = el-radio_label>
@@ -160,7 +160,7 @@
             </el-form-item>
           </el-col>
 
-          <el-col :span="24" class="topic_form">11. 请选择对"心情对你的热体验/热舒适性影响非常大"这一命题的认同程度。</el-col>
+          <el-col :span="24" class="topic_form">11. 请选择对"心情对你的热体验/热舒适性影响非常大"这一命题的认同程度</el-col>
           <el-col :span="24" class="option_form">
             <el-form-item prop="impMood">
               <el-radio-group v-model="infoForm.impMood" class = el-radio_label>
@@ -292,23 +292,29 @@ export default {
   }
 }
 </script>
-<style lang="less">
+<style lang="less" scoped>
   .container {
     /* 让内部设置了 position 的元素相对于此元素定位 */
     position: relative;
     /* 父级内容最好滚动条，而不是任由内容撑开 */
-    max-height: 550px;
+    // max-height: 650px;
+    width: auto;
+    height: 80vh;
     overflow-y: auto;
   }
 
   .details-bg{
+    border-radius: 15px;
+    background-clip: padding-box;
     width: 780px;
     margin: 20px auto;
+    padding: 35px 35px 15px 35px;
+    background: #fff;
   }
-  .form_header{
+  .form_title{
     text-align: center;
-    margin-bottom: 15px;
-    margin-top: 15px;
+    margin-bottom: 12px;
+    margin-top: 18px;
   }
   .block_form{
     border: 1px solid #eaeefb;
