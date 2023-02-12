@@ -19,4 +19,9 @@ public class Result {
         this.message = message;
         this.result = data;
     }
+
+    Result(int code, String message){
+        this.code = code;
+        this.message = message;
+    }
 }

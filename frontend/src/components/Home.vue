@@ -1,12 +1,11 @@
 <template>
   <div>
-    <nav-menu class="nav-menu"></nav-menu>
     <router-view/>
   </div>
 </template>
 <script>
 
-import NavMenu from '@/components/common/NavMenu'
+import NavMenu from './common/NavMenu'
 export default {
   components: {NavMenu}
 }

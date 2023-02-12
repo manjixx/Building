@@ -21,4 +21,12 @@ public class ResultFactory {
     public static Result buildResult(int resultCode, String message, Object data) {
         return new Result(resultCode, message, data);
     }
+
+    public static Result buildResult(ResultCode resultCode, String message) {
+        return new Result(resultCode.code, message);
+    }
+
+    public static Result uploadSuccessResult(String message) {
+        return buildResult(ResultCode.SUCCESS, message);
+    }
 }

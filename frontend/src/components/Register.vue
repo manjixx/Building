@@ -59,7 +59,6 @@ export default{
             type: 'error',
             message: '数据格式不对'
           })
-          // return false;
         }
       })
     },

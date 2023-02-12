@@ -41,10 +41,8 @@ export default {
     // 表单校验并提交
     submitForm (formName) {
       var _this = this
-      console.log(this.$store.state)
+      // console.log(this.$store.state)
       this.$refs.loginForm.validate((valid) => {
-        console.log(valid)
-        console.log(this.loginForm)
         if (valid) {
           login(this.loginForm)
             .then(successResponse => {
@@ -52,7 +50,19 @@ export default {
                 // var data = this.loginForm
                 _this.$store.commit('login', _this.loginForm)
                 var path = this.$route.query.redirect
-                this.$router.replace({path: path === '/' || path === undefined ? '/index' : path})
+                this.$router.replace({path: path === '/' || path === undefined ? 'admin/questionnaire/feedback' : path})
+                successResponse.data.isNewUser = 1
+                if (successResponse.data.isNewUser === 1) {
+                  this.$confirm('请填写基本信息', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                  }).then(() => {
+                    this.$router.push({
+                      path: '/admin/questionnaire/information'
+                    })
+                  })
+                }
               }
             })
             .catch(failResponse => {
