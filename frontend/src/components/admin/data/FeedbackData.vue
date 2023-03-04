@@ -38,14 +38,14 @@
   </div></template>
 
 <script>
-import PanelGroup from './components/PanelGroup'
-import RadarChart from './components/RadarChart'
-import PieChart from './components/PieChart'
-import LineChart from './components/LineChart'
-import BarChart from './components/BarChart'
-import TransactionTable from './components/TransactionTable'
-import TodoList from './components/TodoList'
-import BoxCard from './components/BoxCard'
+import PanelGroup from '../components/PanelGroup'
+import RadarChart from '../components/RadarChart'
+import PieChart from '../components/PieChart'
+import LineChart from '../components/LineChart'
+import BarChart from '../components/BarChart'
+import TransactionTable from '../components/TransactionTable'
+import TodoList from '../components/TodoList'
+import BoxCard from '../components/BoxCard'
 
 const lineChartData = {
   newVisitis: {

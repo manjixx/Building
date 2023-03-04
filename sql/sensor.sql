@@ -15,7 +15,7 @@ CREATE TABLE `device` (
 	`gmt_create` datetime DEFAULT NULL COMMENT 'create time',
   `gmt_modified` datetime DEFAULT NULL COMMENT 'modified time',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
 -- Table structure for indoor_enviornment
@@ -33,7 +33,7 @@ CREATE TABLE `indoor_enviornment` (
 	`pm10` int(11) DEFAULT NULL COMMENT 'PM10浓度',
   `time` datetime DEFAULT NULL COMMENT 'time',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- ----------------------------
@@ -50,7 +50,7 @@ CREATE TABLE `outdoor_enviornment` (
 	`location` varchar(255) DEFAULT NULL COMMENT '地理位置',
   `time` datetime DEFAULT NULL COMMENT 'time',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- ----------------------------
@@ -66,7 +66,7 @@ CREATE TABLE `air_condition` (
 	`location` varchar(255) DEFAULT NULL COMMENT '空调位置',
   `time` datetime DEFAULT NULL COMMENT '设定时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
 -- Table structure for fault
@@ -81,7 +81,7 @@ CREATE TABLE `fault` (
   `gmt_create` datetime DEFAULT NULL COMMENT '故障时间',
   `gmt_modified` datetime DEFAULT NULL COMMENT '修复时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- ----------------------------
@@ -97,7 +97,7 @@ CREATE TABLE `warning` (
   `gmt_create` datetime DEFAULT NULL COMMENT '故障时间',
   `gmt_modified` datetime DEFAULT NULL COMMENT '修复时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- ----------------------------
@@ -112,4 +112,4 @@ CREATE TABLE `work_order` (
   `gmt_create` datetime DEFAULT NULL COMMENT '生成时间',
   `gmt_modified` datetime DEFAULT NULL COMMENT '处理时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
