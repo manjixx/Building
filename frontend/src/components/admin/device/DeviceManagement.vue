@@ -120,8 +120,24 @@
             <el-button type="primary" @click="onSubmit(selectedSensor)">确 定</el-button>
           </div>
         </el-dialog>
-        <el-button>取消选择</el-button>
-        <el-button>批量删除</el-button>
+        <div style="margin: 20px 0 20px 0;float: left">
+          <el-row :gutter=24>
+            <el-col :span="8" class="el-topic">
+              <el-button style="background: #67C23A; color: white">批量添加</el-button>
+            </el-col>
+            <el-col :span="8" class="el-topic">
+              <el-button>取消选择</el-button>
+            </el-col>
+            <el-col :span="8" class="el-topic" >
+              <el-button>批量删除</el-button>
+            </el-col>
+            <!--          <el-col :span="12">-->
+            <!--            <bulk-registration @onSubmit="listUsers()"></bulk-registration>-->
+            <!--          </el-col>-->
+          </el-row>
+        </div>
+<!--        <el-button>取消选择</el-button>-->
+<!--        <el-button>批量删除</el-button>-->
       </div>
     </el-card>
   </div>

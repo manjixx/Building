@@ -37,7 +37,6 @@
         <el-breadcrumb-item>用户信息</el-breadcrumb-item>
       </el-breadcrumb>
     </el-row>
-    <bulk-registration @onSubmit="listUsers()"></bulk-registration>
     <el-card style="margin: 18px 2%;width: 95%">
       <el-table
         :data="users"
@@ -109,8 +108,20 @@
         </el-table-column>
       </el-table>
       <div style="margin: 20px 0 20px 0;float: left">
-        <el-button>取消选择</el-button>
-        <el-button>批量删除</el-button>
+        <el-row :gutter=24>
+          <el-col :span="8" class="el-topic">
+            <el-button style="background: #67C23A; color: white">批量添加</el-button>
+          </el-col>
+          <el-col :span="8" class="el-topic">
+            <el-button>取消选择</el-button>
+          </el-col>
+          <el-col :span="8" class="el-topic" >
+            <el-button>批量删除</el-button>
+          </el-col>
+<!--          <el-col :span="12">-->
+<!--            <bulk-registration @onSubmit="listUsers()"></bulk-registration>-->
+<!--          </el-col>-->
+        </el-row>
       </div>
     </el-card>
   </div>
